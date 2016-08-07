@@ -89,6 +89,8 @@
         _columnList: null, //Name of all data columns in the table (select column and command columns are not included) (string array)
         _fieldList: null, //Name of all fields of a record (defined in fields option) (string array)
         _keyField: null, //Name of the key field of a record (that is defined as 'key: true' in the fields option) (string)
+        //RS
+        _keyFields: null, //Array of names of key fields of a record
 
         _firstDataColumnOffset: 0, //Start index of first record field in table columns (some columns can be placed before first data column, such as select checkbox column) (integer)
         _lastPostData: null, //Last posted data on load method (object)
@@ -160,6 +162,8 @@
             this._columnList = [];
             this._fieldList = [];
             this._cache = [];
+            //RS
+            this._keyFields = [];
         },
 
         /* Fills _fieldList, _columnList arrays and sets _keyField variable.
@@ -176,6 +180,11 @@
                 if (props.key == true) {
                     self._keyField = name;
                 }
+                //RS if this is key -> add to keys array
+                if (props.key == true) {
+                    self._keyFields.push(name);
+                }
+
 
                 //Add field to column list if it is shown in the table
                 if (props.list != false && props.type != 'hidden') {
@@ -381,6 +390,16 @@
 
             return null;
         },
+        //RS multi-key
+        getRowByKeys: function (keys) {
+            for (var i = 0; i < this._$tableRows.length; i++) {
+                if (keys == this._getKeyValuesOfRecord(this._$tableRows[i].data('record'))) {
+                    return this._$tableRows[i];
+                }
+            }
+
+            return null;
+        },
 
         /* Completely removes the table from it's container.
         *************************************************************************/
@@ -490,6 +509,7 @@
             var $tr = $('<tr></tr>')
                 .addClass('jtable-data-row')
                 .attr('data-record-key', this._getKeyValueOfRecord(record))
+                .attr('data-record-keys', this._getKeyValuesOfRecord(record))
                 .data('record', record);
 
             this._addCellsToRowUsingRecord($tr);
@@ -1193,6 +1213,14 @@
         *************************************************************************/
         _getKeyValueOfRecord: function (record) {
             return record[this._keyField];
+        },
+        //RS get key values of keys array
+        _getKeyValuesOfRecord: function (record) {
+            var ret = [];
+            $.each(this._keyFields, function (k,v) {
+                ret.push(record[v]);
+            });
+            return ret;
         },
 
         /************************************************************************

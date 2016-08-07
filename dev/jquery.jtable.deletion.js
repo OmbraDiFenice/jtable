@@ -204,14 +204,26 @@
                 error: function () { }
             }, options);
 
-            if (options.key == undefined) {
+            //if (options.key == undefined) {
+            //    self._logWarn('options parameter in deleteRecord method must contain a key property.');
+            //    return;
+            //}
+
+            //var $deletingRow = self.getRowByKey(options.key);
+            //if ($deletingRow == null) {
+            //    self._logWarn('Can not found any row by key: ' + options.key);
+            //    return;
+            //}
+
+            //RS multi-key
+            if (options.keys == undefined || options.keys == null || option.keys < 1) {
                 self._logWarn('options parameter in deleteRecord method must contain a key property.');
                 return;
             }
 
-            var $deletingRow = self.getRowByKey(options.key);
+            var $deletingRow = self.getRowByKeys(options.keys);
             if ($deletingRow == null) {
-                self._logWarn('Can not found any row by key: ' + options.key);
+                self._logWarn('Can not found any row by key: ' + options.keys);
                 return;
             }
 
@@ -362,6 +374,9 @@
 
             var postData = {};
             postData[self._keyField] = self._getKeyValueOfRecord($row.data('record'));
+            //RS multi-key
+            var keyV = self._getKeyValuesOfRecord($row.data('record'));
+            for(i=0;i<keyV.length;i++){postData[self._keyFields[i]] = keyV[i]}
             
             //deleteAction may be a function, check if it is
             if (!url && $.isFunction(self.options.actions.deleteAction)) {

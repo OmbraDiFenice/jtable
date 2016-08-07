@@ -131,15 +131,28 @@
                 return;
             }
 
-            var key = self._getKeyValueOfRecord(options.record);
-            if (key == undefined || key == null) {
+            //var key = self._getKeyValueOfRecord(options.record);
+            //if (key == undefined || key == null) {
+            //    self._logWarn('options parameter in updateRecord method must contain a record that contains the key field property.');
+            //    return;
+            //}
+
+            //var $updatingRow = self.getRowByKey(key);
+            //if ($updatingRow == null) {
+            //    self._logWarn('Can not found any row by key: ' + key);
+            //    return;
+            //}
+
+            //RS multi-key
+            var keys = self._getKeyValuesOfRecord(options.record);
+            if (keys == undefined || keys == null || keys.length < 1) {
                 self._logWarn('options parameter in updateRecord method must contain a record that contains the key field property.');
                 return;
             }
 
-            var $updatingRow = self.getRowByKey(key);
+            var $updatingRow = self.getRowByKeys(keys);
             if ($updatingRow == null) {
-                self._logWarn('Can not found any row by key "' + key + '" on the table. Updating row must be visible on the table.');
+                self._logWarn('Can not found any row by key "' + keys + '" on the table. Updating row must be visible on the table.');
                 return;
             }
 
@@ -338,6 +351,8 @@
                 self._updateRowTexts(self._$editingRow);
 
                 self._$editingRow.attr('data-record-key', self._getKeyValueOfRecord(record));
+                //RS
+                self._$editingRow.attr('data-record-keys', self._getKeyValuesOfRecord(record));
 
                 self._onRecordUpdated(self._$editingRow, data);
 
